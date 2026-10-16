@@ -1,0 +1,32 @@
+<%- include('partials/header') %>
+<div class="no-print slip-actions">
+  <button class="btn" onclick="window.print()">Print Slip</button>
+  <a class="btn btn-secondary" href="/patients/new">Register Next Patient</a>
+  <a class="btn btn-secondary" href="/lab/new/<%= patient._id %>">Order Lab Tests</a>
+  <% if (user && user.role === 'admin') { %><a class="btn btn-secondary" href="/patients/<%= patient._id %>/edit">Edit Patient</a><% } %>
+</div>
+
+<div class="slip">
+  <div class="slip-head">
+    <div class="slip-title">Hospital OPD Slip</div>
+    <div class="slip-mr"><%= patient.mrNumber %></div>
+  </div>
+
+  <table class="slip-table">
+    <tr><th>Patient</th><td><%= patient.name %></td></tr>
+    <% if (patient.fatherOrHusbandName) { %><tr><th>Father / Husband</th><td><%= patient.fatherOrHusbandName %></td></tr><% } %>
+    <tr><th>Age / Gender</th><td><%= patient.age %> / <%= patient.gender %></td></tr>
+    <tr><th>Phone</th><td><%= patient.phone %></td></tr>
+    <% if (patient.cnic) { %><tr><th>CNIC</th><td><%= patient.cnic %></td></tr><% } %>
+    <% if (patient.address) { %><tr><th>Address</th><td><%= patient.address %></td></tr><% } %>
+    <tr><th>Department</th><td><%= patient.department %></td></tr>
+    <% if (patient.doctor) { %><tr><th>Doctor</th><td><%= patient.doctor %></td></tr><% } %>
+    <tr><th>Date / Time</th><td><%= new Date(patient.createdAt).toLocaleString('en-GB', { timeZone: 'Asia/Karachi' }) %></td></tr>
+  </table>
+
+  <div class="slip-foot">
+    Registered by: <%= patient.registeredBy ? patient.registeredBy.fullName : '-' %><br>
+    Please show this slip at the doctor's room.
+  </div>
+</div>
+<%- include('partials/footer') %>

@@ -1,0 +1,59 @@
+<%- include('partials/header') %>
+<div class="card">
+  <h1>Lab Test Catalog</h1>
+  <% if (error) { %><div class="alert"><%= error %></div><% } %>
+
+  <% if (user && user.role === 'admin') { %>
+  <form method="post" action="/lab/tests" class="inline-add">
+    <input type="hidden" name="_csrf" value="<%= csrf %>">
+    <input type="text" name="name" placeholder="Test name" required maxlength="200">
+    <input type="text" name="category" placeholder="Category" maxlength="100">
+    <input type="number" name="price" placeholder="Price" min="0" step="1" required>
+    <button type="submit" class="btn">Add test</button>
+  </form>
+  <% } else { %>
+    <p class="muted">Only an admin can change tests and prices.</p>
+  <% } %>
+
+  <% if (!tests.length) { %>
+    <p>No tests yet. Run <code>npm run seed-tests</code> to add a starter list.</p>
+  <% } else { %>
+  <div class="table-wrap">
+    <table class="list">
+      <thead><tr><th>Test</th><th>Category</th><th>Price (Rs.)</th><th>Active</th><th></th></tr></thead>
+      <tbody>
+      <% tests.forEach(function(t){ %>
+        <% if (user && user.role === 'admin') { %>
+        <tr>
+          <td><%= t.name %></td>
+          <td><%= t.category %></td>
+          <td><input form="f-<%= t._id %>" type="number" name="price" value="<%= t.price %>" min="0" step="1" class="price-input" required></td>
+          <td><input form="f-<%= t._id %>" type="checkbox" name="active" <%= t.active ? 'checked' : '' %>></td>
+          <td class="row-actions">
+            <button form="f-<%= t._id %>" type="submit" class="btn btn-small btn-dark">Save</button>
+            <button form="f-<%= t._id %>" formaction="/lab/tests/<%= t._id %>/delete" type="submit" class="link-danger" data-confirm="Delete test <%= t.name %> from the catalog? Old orders keep their own copy.">Delete</button>
+          </td>
+        </tr>
+        <% } else { %>
+        <tr>
+          <td><%= t.name %></td>
+          <td><%= t.category %></td>
+          <td><%= t.price.toLocaleString('en-US') %></td>
+          <td><%= t.active ? 'Yes' : 'No' %></td>
+          <td></td>
+        </tr>
+        <% } %>
+      <% }) %>
+      </tbody>
+    </table>
+  </div>
+  <% if (user && user.role === 'admin') { %>
+    <% tests.forEach(function(t){ %>
+      <form id="f-<%= t._id %>" method="post" action="/lab/tests/<%= t._id %>">
+        <input type="hidden" name="_csrf" value="<%= csrf %>">
+      </form>
+    <% }) %>
+  <% } %>
+  <% } %>
+</div>
+<%- include('partials/footer') %>

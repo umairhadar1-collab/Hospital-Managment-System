@@ -1,0 +1,45 @@
+<%- include('partials/header') %>
+<%
+  var LABELS = { name: 'Name', fatherOrHusbandName: 'Father / Husband', age: 'Age', gender: 'Gender', phone: 'Phone', cnic: 'CNIC', address: 'Address', department: 'Department', doctor: 'Doctor', items: 'Tests', total: 'Total', price: 'Price', active: 'Active', category: 'Category', mrNumber: 'MR No', orderNumber: 'Order No' };
+  function show(v) {
+    if (v === undefined || v === null || v === '') return '(empty)';
+    if (Array.isArray(v)) return v.map(function (x) { return typeof x === 'object' && x ? (x.name + (x.price !== undefined ? ' (' + x.price + ')' : '')) : x; }).join(', ') || '(none)';
+    if (typeof v === 'object') return JSON.stringify(v);
+    return String(v);
+  }
+%>
+<div class="card">
+  <h1>Audit Log</h1>
+  <p class="muted">Last 100 admin edits and deletes. A deleted record is kept here, so you can see what was removed.</p>
+  <% if (!logs.length) { %>
+    <p>Nothing here yet.</p>
+  <% } else { %>
+  <div class="table-wrap">
+    <table class="list">
+      <thead><tr><th>Date</th><th>Admin</th><th>Action</th><th>Record</th><th>Details</th></tr></thead>
+      <tbody>
+      <% logs.forEach(function(l){ %>
+        <tr>
+          <td><%= new Date(l.createdAt).toLocaleString('en-GB', { timeZone: 'Asia/Karachi' }) %></td>
+          <td><%= l.byName || '-' %></td>
+          <td><span class="badge <%= l.action === 'delete' ? 'badge-delete' : 'badge-edit' %>"><%= l.action %></span></td>
+          <td><%= l.entity %><br><strong><%= l.label %></strong></td>
+          <td class="audit-detail">
+            <% if (l.action === 'update' && l.after) { %>
+              <% Object.keys(l.after).forEach(function(k){ %>
+                <div><%= LABELS[k] || k %>: <%= show(l.before && l.before[k]) %> &rarr; <strong><%= show(l.after[k]) %></strong></div>
+              <% }) %>
+            <% } else if (l.before) { %>
+              <% Object.keys(l.before).forEach(function(k){ %>
+                <div><%= LABELS[k] || k %>: <%= show(l.before[k]) %></div>
+              <% }) %>
+            <% } %>
+          </td>
+        </tr>
+      <% }) %>
+      </tbody>
+    </table>
+  </div>
+  <% } %>
+</div>
+<%- include('partials/footer') %>

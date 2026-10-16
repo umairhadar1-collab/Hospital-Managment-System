@@ -1,0 +1,63 @@
+<%- include('partials/header') %>
+<% var f = form || {}; %>
+<div class="card">
+  <h1><%= locals.heading || 'Patient Registration' %></h1>
+  <% if (locals.mrNumber) { %>
+    <p class="patient-bar">MR number: <strong><%= mrNumber %></strong> (cannot be changed)</p>
+  <% } %>
+  <% if (errors.length) { %>
+    <div class="alert">
+      <ul><% errors.forEach(function(e){ %><li><%= e %></li><% }) %></ul>
+    </div>
+  <% } %>
+  <form method="post" action="<%= locals.action || '/patients' %>" class="grid">
+    <input type="hidden" name="_csrf" value="<%= csrf %>">
+
+    <label class="full">Patient name *
+      <input type="text" name="name" value="<%= f.name || '' %>" maxlength="200" required autofocus>
+    </label>
+
+    <label>Father / Husband name
+      <input type="text" name="fatherOrHusbandName" value="<%= f.fatherOrHusbandName || '' %>" maxlength="200">
+    </label>
+
+    <label>Age *
+      <input type="number" name="age" min="0" max="120" value="<%= (f.age === undefined || f.age === null) ? '' : f.age %>" required>
+    </label>
+
+    <label>Gender *
+      <select name="gender" required>
+        <option value="">Select</option>
+        <% ['Male','Female','Other'].forEach(function(g){ %>
+          <option value="<%= g %>" <%= f.gender === g ? 'selected' : '' %>><%= g %></option>
+        <% }) %>
+      </select>
+    </label>
+
+    <label>Phone *
+      <input type="tel" name="phone" value="<%= f.phone || '' %>" maxlength="20" required>
+    </label>
+
+    <label>CNIC (optional)
+      <input type="text" name="cnic" value="<%= f.cnic || '' %>" maxlength="20" placeholder="00000-0000000-0">
+    </label>
+
+    <label>Department
+      <input type="text" name="department" value="<%= f.department || 'General OPD' %>" maxlength="200">
+    </label>
+
+    <label>Doctor (optional)
+      <input type="text" name="doctor" value="<%= f.doctor || '' %>" maxlength="200">
+    </label>
+
+    <label class="full">Address
+      <textarea name="address" rows="2" maxlength="300"><%= f.address || '' %></textarea>
+    </label>
+
+    <div class="full actions">
+      <button type="submit" class="btn"><%= locals.submitLabel || 'Save & Print Slip' %></button>
+      <% if (locals.cancelUrl) { %><a class="btn btn-secondary" href="<%= cancelUrl %>">Cancel</a><% } %>
+    </div>
+  </form>
+</div>
+<%- include('partials/footer') %>

@@ -1,0 +1,38 @@
+<%- include('partials/header') %>
+<div class="card">
+  <h1>Lab Orders</h1>
+  <p><a class="btn" href="/lab/new">New Lab Order</a></p>
+  <% if (!orders.length) { %>
+    <p>No lab orders yet.</p>
+  <% } else { %>
+  <div class="table-wrap">
+    <table class="list">
+      <thead><tr><th>Order No</th><th>Patient</th><th>MR No</th><th>Tests</th><th>Total (Rs.)</th><th>Status</th><th>Date</th><th></th></tr></thead>
+      <tbody>
+      <% orders.forEach(function(o){ %>
+        <tr>
+          <td><%= o.orderNumber %></td>
+          <td><%= o.patient ? o.patient.name : '-' %></td>
+          <td><%= o.patient ? o.patient.mrNumber : '-' %></td>
+          <td><%= o.items.length %></td>
+          <td><%= o.total.toLocaleString('en-US') %></td>
+          <td><%= o.status %></td>
+          <td><%= new Date(o.createdAt).toLocaleString('en-GB', { timeZone: 'Asia/Karachi' }) %></td>
+          <td class="row-actions">
+            <a href="/lab/orders/<%= o._id %>/slip">Reprint</a>
+            <% if (user && user.role === 'admin') { %>
+              &middot; <a href="/lab/orders/<%= o._id %>/edit">Edit</a>
+              <form method="post" action="/lab/orders/<%= o._id %>/delete" class="inline-form">
+                <input type="hidden" name="_csrf" value="<%= csrf %>">
+                <button type="submit" class="link-danger" data-confirm="Delete lab order <%= o.orderNumber %>? This cannot be undone.">Delete</button>
+              </form>
+            <% } %>
+          </td>
+        </tr>
+      <% }) %>
+      </tbody>
+    </table>
+  </div>
+  <% } %>
+</div>
+<%- include('partials/footer') %>

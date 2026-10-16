@@ -1,0 +1,40 @@
+<%- include('partials/header') %>
+<div class="no-print slip-actions">
+  <button class="btn" onclick="window.print()">Print Lab Slip</button>
+  <a class="btn btn-secondary" href="/lab/new">New Lab Order</a>
+  <% if (user && user.role === 'admin') { %>
+    <a class="btn btn-secondary" href="/lab/orders/<%= order._id %>/edit">Edit Order</a>
+  <% } %>
+</div>
+
+<div class="slip">
+  <div class="slip-head">
+    <div class="slip-title">Laboratory Slip</div>
+    <div class="slip-mr"><%= order.orderNumber %></div>
+  </div>
+
+  <table class="slip-table">
+    <tr><th>Patient</th><td><%= order.patient.name %></td></tr>
+    <tr><th>MR No</th><td><%= order.patient.mrNumber %></td></tr>
+    <tr><th>Age / Gender</th><td><%= order.patient.age %> / <%= order.patient.gender %></td></tr>
+    <tr><th>Date / Time</th><td><%= new Date(order.createdAt).toLocaleString('en-GB', { timeZone: 'Asia/Karachi' }) %></td></tr>
+  </table>
+
+  <table class="slip-items">
+    <thead><tr><th>Test</th><th class="num">Rs.</th></tr></thead>
+    <tbody>
+      <% order.items.forEach(function(i){ %>
+        <tr><td><%= i.name %></td><td class="num"><%= i.price.toLocaleString('en-US') %></td></tr>
+      <% }) %>
+    </tbody>
+    <tfoot>
+      <tr><td>Total</td><td class="num"><%= order.total.toLocaleString('en-US') %></td></tr>
+    </tfoot>
+  </table>
+
+  <div class="slip-foot">
+    Ordered by: <%= order.createdBy ? order.createdBy.fullName : '-' %><br>
+    Please give this slip at the laboratory.
+  </div>
+</div>
+<%- include('partials/footer') %>

@@ -1,0 +1,13 @@
+<%- include('partials/header') %>
+<div class="card login-card">
+  <h1>New Lab Order</h1>
+  <p class="muted">Enter the patient's MR number from the registration slip.</p>
+  <% if (error) { %><div class="alert"><%= error %></div><% } %>
+  <form method="get" action="/lab/new">
+    <label>MR number
+      <input type="text" name="mr" value="<%= mr %>" placeholder="MR-000001" required autofocus>
+    </label>
+    <button type="submit" class="btn">Find patient</button>
+  </form>
+</div>
+<%- include('partials/footer') %>

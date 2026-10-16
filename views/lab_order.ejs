@@ -1,0 +1,52 @@
+<%- include('partials/header') %>
+<div class="card">
+  <h1><%= locals.heading || 'Lab Tests' %></h1>
+  <p class="patient-bar">
+    <strong><%= patient.name %></strong> &middot; <%= patient.mrNumber %> &middot; <%= patient.age %> / <%= patient.gender %>
+  </p>
+
+  <% if (error) { %><div class="alert"><%= error %></div><% } %>
+
+  <% if (!hasTests) { %>
+    <div class="alert">The test list is empty. Run <code>npm run seed-tests</code> or ask an admin to add tests on the Lab Tests page.</div>
+  <% } else { %>
+  <form method="post" action="<%= locals.action || '/lab/orders' %>" id="orderForm">
+    <input type="hidden" name="_csrf" value="<%= csrf %>">
+    <input type="hidden" name="patientId" value="<%= patient._id %>">
+
+    <% Object.keys(groups).forEach(function(cat){ %>
+      <fieldset class="test-group">
+        <legend><%= cat %></legend>
+        <% groups[cat].forEach(function(t){ %>
+          <label class="test-row">
+            <input type="checkbox" name="tests" value="<%= t._id %>" data-price="<%= t.price %>" <%= (locals.selected || []).indexOf(String(t._id)) !== -1 ? 'checked' : '' %>>
+            <span class="test-name"><%= t.name %></span>
+            <span class="test-price">Rs. <%= t.price.toLocaleString('en-US') %></span>
+          </label>
+        <% }) %>
+      </fieldset>
+    <% }) %>
+
+    <div class="order-total">
+      Selected: <strong id="count">0</strong> test(s) &nbsp; Total: <strong>Rs. <span id="total">0</span></strong>
+    </div>
+    <button type="submit" class="btn"><%= locals.submitLabel || 'Save & Print Lab Slip' %></button>
+    <% if (locals.cancelUrl) { %><a class="btn btn-secondary" href="<%= cancelUrl %>">Cancel</a><% } %>
+  </form>
+
+  <script>
+    (function () {
+      var boxes = document.querySelectorAll('input[name="tests"]');
+      function update() {
+        var count = 0, total = 0;
+        boxes.forEach(function (b) { if (b.checked) { count++; total += Number(b.dataset.price); } });
+        document.getElementById('count').textContent = count;
+        document.getElementById('total').textContent = total.toLocaleString('en-US');
+      }
+      boxes.forEach(function (b) { b.addEventListener('change', update); });
+      update();
+    })();
+  </script>
+  <% } %>
+</div>
+<%- include('partials/footer') %>

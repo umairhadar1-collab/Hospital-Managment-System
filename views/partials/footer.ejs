@@ -1,0 +1,10 @@
+</main>
+<script>
+  // Ask "are you sure?" before any button that has a data-confirm message.
+  document.addEventListener('click', function (e) {
+    var el = e.target.closest('[data-confirm]');
+    if (el && !window.confirm(el.getAttribute('data-confirm'))) e.preventDefault();
+  });
+</script>
+</body>
+</html>

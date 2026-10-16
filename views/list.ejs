@@ -1,0 +1,46 @@
+<%- include('partials/header') %>
+<% var isAdmin = user && user.role === 'admin'; %>
+<div class="card">
+  <h1><%= locals.q ? 'Search Patients' : 'Recent Patients' %></h1>
+  <form method="get" action="/patients" class="search-bar">
+    <input type="text" name="q" value="<%= locals.q || '' %>" placeholder="Search by name, MR number or phone" maxlength="100">
+    <button type="submit" class="btn">Search</button>
+    <% if (locals.q) { %><a class="btn btn-secondary" href="/patients">Clear</a><% } %>
+  </form>
+  <% if (locals.error) { %><div class="alert"><%= error %></div><% } %>
+  <% if (!patients.length) { %>
+    <p><%= locals.q ? 'No patient matches your search.' : 'No patients registered yet.' %></p>
+  <% } else { %>
+  <div class="table-wrap">
+    <table class="list">
+      <thead>
+        <tr><th>MR No</th><th>Name</th><th>Age</th><th>Gender</th><th>Phone</th><th>Department</th><th>Registered</th><th></th></tr>
+      </thead>
+      <tbody>
+      <% patients.forEach(function(p){ %>
+        <tr>
+          <td><%= p.mrNumber %></td>
+          <td><%= p.name %></td>
+          <td><%= p.age %></td>
+          <td><%= p.gender %></td>
+          <td><%= p.phone %></td>
+          <td><%= p.department %></td>
+          <td><%= new Date(p.createdAt).toLocaleString('en-GB', { timeZone: 'Asia/Karachi' }) %></td>
+          <td class="row-actions">
+            <a href="/patients/<%= p._id %>/slip">Reprint</a> &middot; <a href="/lab/new/<%= p._id %>">Lab</a>
+            <% if (isAdmin) { %>
+              &middot; <a href="/patients/<%= p._id %>/edit">Edit</a>
+              <form method="post" action="/patients/<%= p._id %>/delete" class="inline-form">
+                <input type="hidden" name="_csrf" value="<%= csrf %>">
+                <button type="submit" class="link-danger" data-confirm="Delete patient <%= p.name %> (<%= p.mrNumber %>)? This cannot be undone.">Delete</button>
+              </form>
+            <% } %>
+          </td>
+        </tr>
+      <% }) %>
+      </tbody>
+    </table>
+  </div>
+  <% } %>
+</div>
+<%- include('partials/footer') %>
